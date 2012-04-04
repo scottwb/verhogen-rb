@@ -22,6 +22,11 @@ module Verhogen
       JSON.parse(res.body)
     end
 
+    def get(path)
+      res = Net::HTTP.new(@host, @port).get("#{path}.json")
+      JSON.parse(res.body)
+    end
+
     def mutex(opts = {})
       Verhogen::Mutex.new(opts.merge(:client => self))
     end
@@ -72,10 +77,15 @@ module Verhogen
     private
 
     def create_if_necessary
-      if @uuid.nil?
-        resp = client.post("/mutexes", {:name => @name})
-        @uuid = resp['uuid']
-      end
+      resp = if @uuid
+               # Info info from server about this Mutex instance
+               client.get("/mutexes/#{@uuid}")
+             else
+               # Create a new Mutex instance on server
+               client.post("/mutexes", {:name => @name})
+             end
+      @uuid = resp['uuid']
+      @name = resp['name']
     end
 
     def holding_lock?
