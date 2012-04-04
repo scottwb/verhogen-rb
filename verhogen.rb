@@ -74,7 +74,7 @@ module Verhogen
     def create_if_necessary
       if @uuid.nil?
         resp = client.post("/mutexes", {:name => @name})
-        @uuid = resp['id']
+        @uuid = resp['uuid']
       end
     end
 
