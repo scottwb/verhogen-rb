@@ -70,6 +70,12 @@ module Verhogen
       true
     end
 
+    def destroy
+      resp = client.post("/mutexes/#{@uuid}", {"_method" => "delete"})
+      @client = nil # So that we can't try to use this instance anymore
+      true
+    end
+
 
     ############################################################
     # Private Instance Methods
