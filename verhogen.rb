@@ -70,6 +70,10 @@ module Verhogen
       true
     end
 
+    def holding_lock?
+      @holding_lock
+    end
+
     def destroy
       resp = client.post("/mutexes/#{@uuid}", {"_method" => "delete"})
       @client = nil # So that we can't try to use this instance anymore
@@ -90,12 +94,9 @@ module Verhogen
                # Create a new Mutex instance on server
                client.post("/mutexes", {:name => @name})
              end
-      @uuid = resp['uuid']
-      @name = resp['name']
-    end
-
-    def holding_lock?
-      @holding_lock
+      @uuid         = resp['uuid']
+      @name         = resp['name']
+      @holding_lock = resp['holdingLock']
     end
   end
 
