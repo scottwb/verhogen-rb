@@ -27,6 +27,11 @@ module Verhogen
       process_response(res)
     end
 
+    # Issue a fake DELETE method request using the conventional _method param.
+    def delete(path, params = {})
+      post(path, params.merge("_method" => "delete"))
+    end
+
     def mutex(opts = {})
       Verhogen::Mutex.new(opts.merge(:client => self))
     end
@@ -91,7 +96,7 @@ module Verhogen
     end
 
     def destroy
-      resp = client.post("/mutexes/#{@uuid}", {"_method" => "delete"})
+      resp = client.delete("/mutexes/#{@uuid}")
       @client = nil # So that we can't try to use this instance anymore
       true
     end
