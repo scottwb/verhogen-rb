@@ -19,16 +19,32 @@ module Verhogen
       http = Net::HTTP.new(@host, @port)
       http.read_timeout = MAX_LOCK_TIMEOUT
       res = http.post("#{path}.json", payload)
-      JSON.parse(res.body)
+      process_response(res)
     end
 
     def get(path)
       res = Net::HTTP.new(@host, @port).get("#{path}.json")
-      JSON.parse(res.body)
+      process_response(res)
     end
 
     def mutex(opts = {})
       Verhogen::Mutex.new(opts.merge(:client => self))
+    end
+
+
+    ############################################################
+    # Private Methods
+    ############################################################
+    private
+
+    def process_response(response)
+      res = JSON.parse(response.body)
+      if res['error']
+        raise res['message'] || res['error']
+      end
+      return res
+    rescue JSON::ParserError => e
+      raise "UnknownError"
     end
   end
 
