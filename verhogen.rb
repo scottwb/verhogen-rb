@@ -33,7 +33,18 @@ module Verhogen
     end
 
     def mutex(opts = {})
-      Verhogen::Mutex.new(opts.merge(:client => self))
+      m = Verhogen::Mutex.new(opts.merge(:client => self))
+      return m unless block_given?
+
+      m.acquire
+      begin
+        yield
+      ensure
+        m.release
+        m.destroy
+      end
+
+      nil
     end
 
 
